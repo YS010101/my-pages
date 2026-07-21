@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>지비즈 11기 모집 랜딩 페이지 목업</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Pretendard', -apple-system, sans-serif;
+    background: #FBF3E7;
+    padding: 40px 16px;
+    color: #2B2620;
+  }
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+    background: #FFFFFF;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(120,60,40,0.10);
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    background: linear-gradient(160deg, #FFF3E3 0%, #FDE4E7 60%, #FCE8DE 100%);
+    padding: 60px 32px 46px;
+    text-align: center;
+    overflow: hidden;
+  }
+  .hero .blob {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.55;
+  }
+  .hero .blob.b1 { width: 130px; height: 130px; background: #FFD9A0; top: -40px; left: -30px; }
+  .hero .blob.b2 { width: 90px; height: 90px; background: #FFC2C9; bottom: -20px; right: 10px; }
+  .hero .blob.b3 { width: 46px; height: 46px; background: #FFFFFF; top: 30px; right: 60px; opacity: 0.7; }
+  .hero-content { position: relative; z-index: 1; }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #A32D2D;
+    background: rgba(255,255,255,0.75);
+    padding: 6px 16px;
+    border-radius: 999px;
+    margin-bottom: 18px;
+    letter-spacing: 0.02em;
+  }
+  .hero h1 {
+    font-size: 30px;
+    font-weight: 800;
+    margin-bottom: 10px;
+    line-height: 1.35;
+    color: #4A1B0C;
+  }
+  .hero p.sub {
+    font-size: 15px;
+    color: #8A5A3E;
+    margin-bottom: 30px;
+    font-weight: 500;
+  }
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #E41A34;
+    color: #FFFFFF;
+    font-weight: 700;
+    font-size: 16px;
+    padding: 15px 44px;
+    border-radius: 999px;
+    text-decoration: none;
+    box-shadow: 0 8px 20px rgba(228,26,52,0.35);
+  }
+
+  /* INFO STRIP */
+  .info-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    background: #4A1B0C;
+  }
+  .info-bar div {
+    padding: 20px 8px;
+    text-align: center;
+    border-right: 1px solid rgba(255,255,255,0.12);
+  }
+  .info-bar div:last-child { border-right: none; }
+  .info-label { font-size: 11px; color: rgba(255,255,255,0.6); margin-bottom: 6px; }
+  .info-value { font-size: 15px; font-weight: 700; color: #FFFFFF; }
+
+  .section { padding: 36px 32px; border-bottom: 1px solid #F3EEE6; }
+  .section:last-child { border-bottom: none; }
+  .section-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    color: #D85A30;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+  }
+  .section-title { font-size: 19px; font-weight: 800; margin-bottom: 18px; color: #2B2620; }
+
+  /* TRACKS */
+  .tracks { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .track-card {
+    border-radius: 16px;
+    padding: 20px 22px;
+    position: relative;
+  }
+  .track-card.a { background: linear-gradient(155deg, #FFF0EE 0%, #FFE3E0 100%); border: 2px solid #F09995; }
+  .track-card.b { background: #F7F5F0; border: 2px solid #EDE8DD; }
+  .track-icon {
+    width: 40px; height: 40px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 12px; font-size: 20px;
+  }
+  .track-card.a .track-icon { background: #F09995; }
+  .track-card.b .track-icon { background: #D3D1C7; }
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 11px;
+    border-radius: 999px;
+    margin-bottom: 10px;
+  }
+  .badge.a { color: #791F1F; background: #FFFFFF; }
+  .badge.b { color: #5F5E5A; background: #FFFFFF; }
+  .track-card h3 { font-size: 16px; font-weight: 800; margin-bottom: 8px; color: #2B2620; }
+  .track-card p { font-size: 13px; color: #6B5D50; line-height: 1.6; }
+
+  /* PRODUCTS */
+  .products { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .product-card {
+    border-radius: 14px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .product-card .p-icon {
+    width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; color: #FFFFFF; font-weight: 800;
+  }
+  .product-card h4 { font-size: 14px; font-weight: 800; margin-bottom: 3px; color: #2B2620; }
+  .product-card p { font-size: 12px; color: #7A7267; }
+  .p-gragre { background: #FDF3D8; } .p-gragre .p-icon { background: #EF9F27; }
+  .p-nature { background: #E9F2DE; } .p-nature .p-icon { background: #639922; }
+  .p-dino   { background: #E3EEFB; } .p-dino   .p-icon { background: #378ADD; }
+  .p-story  { background: #F5E9EE; } .p-story  .p-icon { background: #D4537E; }
+
+  /* TIMELINE */
+  .timeline { display: grid; grid-template-columns: repeat(4, 1fr); position: relative; }
+  .timeline::before {
+    content: "";
+    position: absolute;
+    top: 15px;
+    left: 12.5%;
+    right: 12.5%;
+    height: 2px;
+    background: #F3EEE6;
+    z-index: 0;
+  }
+  .tl-step { text-align: center; position: relative; z-index: 1; }
+  .tl-num {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: #E41A34; color: #fff; font-weight: 800; font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 10px;
+  }
+  .tl-label { font-size: 12.5px; font-weight: 700; margin-bottom: 3px; color: #2B2620; }
+  .tl-date { font-size: 11px; color: #999385; }
+
+  /* SUMMARY */
+  .summary-bar {
+    display: flex;
+    justify-content: space-between;
+    background: linear-gradient(135deg, #FFF3E3 0%, #FDE4E7 100%);
+    border-radius: 14px;
+    padding: 20px 24px;
+    gap: 24px;
+  }
+  .summary-bar h4 { font-size: 13px; font-weight: 800; margin-bottom: 4px; color: #4A1B0C; }
+  .summary-bar p { font-size: 12px; color: #8A5A3E; }
+  .summary-bar .right { text-align: right; }
+
+  .footer-note {
+    text-align: center;
+    padding: 18px;
+    font-size: 11px;
+    color: #B4AFA3;
+    background: #FBF9F5;
+  }
+
+  @media (max-width: 560px) {
+    .info-bar { grid-template-columns: repeat(2, 1fr); }
+    .info-bar div:nth-child(2) { border-right: none; }
+    .tracks, .products { grid-template-columns: 1fr; }
+    .timeline { grid-template-columns: repeat(2, 1fr); row-gap: 22px; }
+    .timeline::before { display: none; }
+    .summary-bar { flex-direction: column; }
+    .summary-bar .right { text-align: left; }
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+
+    <div class="hero">
+      <div class="blob b1"></div>
+      <div class="blob b2"></div>
+      <div class="blob b3"></div>
+      <div class="hero-content">
+        <span class="eyebrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A32D2D" stroke-width="2"><path d="M12 3l1.8 5.4L19 10l-5.2 1.6L12 17l-1.8-5.4L5 10l5.2-1.6L12 3z"/></svg> 지비즈 11기 서포터즈 모집</span>
+        <h1>그레이트북스와 함께<br>책 육아를 나눠요</h1>
+        <p class="sub">네이버 메이트 중심 · 채널 오픈형</p>
+        <a class="cta" href="#" onclick="return false;">지원하기 →</a>
+      </div>
+    </div>
+
+    <div class="info-bar">
+      <div><div class="info-label">모집 기간</div><div class="info-value">8.27 - 9.2</div></div>
+      <div><div class="info-label">결과 발표</div><div class="info-value">9.9</div></div>
+      <div><div class="info-label">활동 기간</div><div class="info-value">9.17 - 12.9</div></div>
+      <div><div class="info-label">미션</div><div class="info-value">2주 x 6회</div></div>
+    </div>
+
+    <div class="section">
+      <div class="section-eyebrow">RECRUIT TRACK</div>
+      <div class="section-title">모집 트랙</div>
+      <div class="tracks">
+        <div class="track-card a">
+          <div class="track-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.3 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8L12 2z"/></svg></div>
+          <span class="badge a">우선 선발</span>
+          <h3>Track A · 네이버 메이트</h3>
+          <p>메이트 앰블럼 보유 블로그, 별도 인증 없이 신청 주소로 확인해요</p>
+        </div>
+        <div class="track-card b">
+          <div class="track-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5F5E5A" stroke-width="2"><rect x="4" y="2" width="10" height="16" rx="1.5"/><path d="M9 15h0"/><rect x="15" y="8" width="6" height="10" rx="1.2"/></svg></div>
+          <span class="badge b">채널 자유</span>
+          <h3>Track B · 오픈 채널</h3>
+          <p>블로그, 인스타그램, 유튜브 등 채널 제한 없이 지원 가능해요</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-eyebrow">TARGET COLLECTIONS</div>
+      <div class="section-title">대상 전집 4종</div>
+      <div class="products">
+        <div class="product-card p-gragre">
+          <div class="p-icon">G</div>
+          <div><h4>그래그래</h4><p>0~3세 · 신규 접점</p></div>
+        </div>
+        <div class="product-card p-nature">
+          <div class="p-icon">N</div>
+          <div><h4>놀라운자연</h4><p>경쟁사 9월 출시 대응</p></div>
+        </div>
+        <div class="product-card p-dino">
+          <div class="p-icon">D</div>
+          <div><h4>내친구 과학공룡</h4><p>12월 개정 예정</p></div>
+        </div>
+        <div class="product-card p-story">
+          <div class="p-icon">S</div>
+          <div><h4>이야기꽃할망</h4><p>10월 개정 예정</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-eyebrow">SCHEDULE</div>
+      <div class="section-title">일정 안내</div>
+      <div class="timeline">
+        <div class="tl-step"><div class="tl-num">1</div><div class="tl-label">개인정보 취합</div><div class="tl-date">9.9 - 9.10</div></div>
+        <div class="tl-step"><div class="tl-num">2</div><div class="tl-label">제품 배송</div><div class="tl-date">9.11 - 9.16</div></div>
+        <div class="tl-step"><div class="tl-num">3</div><div class="tl-label">줌 오티</div><div class="tl-date">9.15</div></div>
+        <div class="tl-step"><div class="tl-num">4</div><div class="tl-label">활동 시작</div><div class="tl-date">9.17</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="summary-bar">
+        <div>
+          <h4>리워드 · 예산</h4>
+          <p>10기와 동일 기준 적용</p>
+        </div>
+        <div class="right">
+          <h4>가산점</h4>
+          <p>네이버 클립·오늘의집·스레드 추가 게재 시</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-note">그레이트북스 마케팅팀 · 지비즈 11기 모집 랜딩 페이지 목업</div>
+
+  </div>
+</body>
+</html>
