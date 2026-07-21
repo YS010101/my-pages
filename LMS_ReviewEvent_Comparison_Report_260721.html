@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>고객 후기 이벤트 - LMS 발송 성과 비교 분석 보고서</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 15mm 12mm;
+            background-color: #fcfcfd;
+        }
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            color: #2d3748;
+            margin: 0;
+            padding: 0;
+            font-size: 10pt;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background-color: #1a365d;
+            color: #ffffff;
+            margin: -15mm -12mm 20px -12mm;
+            padding: 25px 20px 20px 20px;
+        }
+        .header-top {
+            font-size: 9pt;
+            letter-spacing: 1px;
+            color: #90cdf4;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .header-title {
+            font-size: 18pt;
+            font-weight: bold;
+            margin: 0 0 10px 0;
+            line-height: 1.2;
+        }
+        .header-meta {
+            font-size: 8.5pt;
+            color: #cbd5e0;
+        }
+
+        .summary-box {
+            background-color: #ebf8ff;
+            border-left: 4px solid #3182ce;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            border-radius: 0 4px 4px 0;
+        }
+        .summary-title {
+            font-weight: bold;
+            color: #2b6cb0;
+            font-size: 10.5pt;
+            margin-bottom: 5px;
+        }
+
+        .kpi-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .kpi-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 12px;
+            text-align: center;
+        }
+        .kpi-value {
+            font-size: 14pt;
+            font-weight: bold;
+            color: #2b6cb0;
+            margin-top: 2px;
+        }
+        .kpi-label {
+            font-size: 8.5pt;
+            color: #718096;
+            font-weight: bold;
+        }
+        .kpi-sub {
+            font-size: 7.5pt;
+            color: #a0aec0;
+            margin-top: 2px;
+        }
+
+        section {
+            margin-bottom: 22px;
+        }
+        h2 {
+            font-size: 12pt;
+            color: #1a365d;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 5px;
+            margin-top: 0;
+            margin-bottom: 12px;
+        }
+        
+        table.data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9pt;
+            margin-bottom: 15px;
+            background: #ffffff;
+        }
+        table.data-table th {
+            background-color: #2b6cb0;
+            color: #ffffff;
+            text-align: center;
+            padding: 8px 6px;
+            font-weight: bold;
+            border: 1px solid #2c5282;
+        }
+        table.data-table td {
+            padding: 8px 6px;
+            border: 1px solid #e2e8f0;
+            text-align: right;
+        }
+        table.data-table td.left {
+            text-align: left;
+        }
+        table.data-table td.center {
+            text-align: center;
+        }
+        table.data-table tr.curr-row {
+            background-color: #feefc3;
+            font-weight: bold;
+        }
+        table.data-table tr.prev-row {
+            background-color: #ffffff;
+        }
+        table.data-table tr.diff-row {
+            background-color: #edf2f7;
+            font-weight: bold;
+        }
+
+        .insight-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            page-break-inside: avoid;
+        }
+        .insight-badge {
+            display: inline-block;
+            background-color: #319795;
+            color: white;
+            font-size: 8pt;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-bottom: 5px;
+        }
+        .insight-badge.action {
+            background-color: #dd6b20;
+        }
+        .insight-title {
+            font-weight: bold;
+            font-size: 9.5pt;
+            color: #2d3748;
+            margin-bottom: 4px;
+        }
+        .insight-body {
+            font-size: 9pt;
+            color: #4a5568;
+            margin: 0;
+        }
+        
+        ul {
+            margin: 5px 0;
+            padding-left: 18px;
+        }
+        li {
+            margin-bottom: 3px;
+        }
+        
+        .footer {
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #e2e8f0;
+            font-size: 8pt;
+            color: #a0aec0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="header-top">GREATBOOKS PERFORMANCE MARKETING REPORT</div>
+        <div class="header-title">고객 후기 이벤트 - LMS 발송 성과 비교 분석 보고서</div>
+        <div class="header-meta">
+            분석 기간: 2026.07.15 ~ 2026.07.20 (7월 회차, 6일간) vs 2026.05.11 ~ 2026.05.16 (5월 회차, 6일간) &nbsp;|&nbsp; 출처: GA4 트래픽 획득 보고서 &nbsp;|&nbsp; 작성자: 마케팅팀 김이수
+        </div>
+    </div>
+
+    <div class="summary-box">
+        <div class="summary-title">📌 Executive Summary</div>
+        5월 대비 7월 LMS 발송 모수가 감소(42,366명 → 39,446명, -6.9%)함에 따라 유입 사용자 수(-13.5%)는 소폭 줄었으나, 실제 발송 대비 클릭률(CTR)은 유사한 수준(1.15%)을 방어했습니다 [cite: 1, 15]. 특히 유입 유저의 <b>참여율(27.86%, +0.74%p 상승)</b>과 <b>평균 체류 시간(10.2초, +37.8% 증가)</b>이 뚜렷하게 개선되어 타겟 유저의 정성적 반응도가 한층 높아진 것으로 확인됩니다 [cite: 1, 15].
+    </div>
+
+    <!-- KPI Dashboard Table -->
+    <table class="kpi-table">
+        <tr>
+            <td style="width: 25%; padding-right: 5px;">
+                <div class="kpi-card">
+                    <div class="kpi-label">발송 모수 / CTR</div>
+                    <div class="kpi-value">39,446명 (1.15%)</div>
+                    <div class="kpi-sub">5월 모수(42,366명, 1.24%) 대비 효율 방어</div>
+                </div>
+            </td>
+            <td style="width: 25%; padding: 0 5px;">
+                <div class="kpi-card">
+                    <div class="kpi-label">유입 사용자 수</div>
+                    <div class="kpi-value">454명</div>
+                    <div class="kpi-sub">5월(525명) 대비 -13.5%</div>
+                </div>
+            </td>
+            <td style="width: 25%; padding: 0 5px;">
+                <div class="kpi-card">
+                    <div class="kpi-label">참여율</div>
+                    <div class="kpi-value">27.86%</div>
+                    <div class="kpi-sub">5월(27.12%) 대비 +0.74%p ↑</div>
+                </div>
+            </td>
+            <td style="width: 25%; padding-left: 5px;">
+                <div class="kpi-card">
+                    <div class="kpi-label">평균 체류시간</div>
+                    <div class="kpi-value">10.2초</div>
+                    <div class="kpi-sub">5월(7.4초) 대비 +37.8% ↑</div>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <section>
+        <h2>1. 회차별 발송 모수 및 LMS 성과 비교 (동일 6일 기간)</h2>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>구분 (발송 회차)</th>
+                    <th>측정 기간</th>
+                    <th>발송 모수</th>
+                    <th>유입 사용자</th>
+                    <th>클릭률 (CTR)</th>
+                    <th>세션수</th>
+                    <th>참여율</th>
+                    <th>평균 체류시간</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="curr-row">
+                    <td class="center"><b>최근 (2026년 7월)</b></td>
+                    <td class="center">07.15 ~ 07.20</td>
+                    <td>39,446명</td>
+                    <td><b>454명</b></td>
+                    <td><b>1.15%</b></td>
+                    <td><b>682회</b></td>
+                    <td><b>27.86%</b></td>
+                    <td><b>10.2초</b></td>
+                </tr>
+                <tr class="prev-row">
+                    <td class="center">이전 (2026년 5월)</td>
+                    <td class="center">05.11 ~ 05.16</td>
+                    <td>42,366명</td>
+                    <td>525명</td>
+                    <td>1.24%</td>
+                    <td>826회</td>
+                    <td>27.12%</td>
+                    <td>7.4초</td>
+                </tr>
+                <tr class="diff-row">
+                    <td class="center" colspan="2">증감률 / 증감폭</td>
+                    <td>-6.9%</td>
+                    <td>-13.5%</td>
+                    <td>-0.09%p</td>
+                    <td>-17.4%</td>
+                    <td><b>+0.74%p ↑</b></td>
+                    <td><b>+37.8% ↑</b></td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2>2. 데이터 비교 및 유입/체류 핵심 인사이트</h2>
+
+        <div class="insight-card">
+            <span class="insight-badge">유입 성과</span>
+            <div class="insight-title">① 모수 감소 대비 안정적인 클릭 효율(CTR) 유지</div>
+            <div class="insight-body">
+                <ul>
+                    <li>7월 발송 모수(39,446명)가 5월(42,366명) 대비 약 6.9% 감소함에 따라 유입 사용자 수(454명)도 소폭 감소했습니다 [cite: 1, 15].</li>
+                    <li>다만 발송 대비 클릭률(CTR)은 5월 1.24%에서 7월 1.15%로 거의 유사한 수준을 기록하여, LMS 메시지 소킹의 반응 효율은 안정적으로 방어되었습니다 [cite: 1, 15].</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="insight-card">
+            <span class="insight-badge">질적 성과</span>
+            <div class="insight-title">② 참여율(+0.74%p) 및 체류시간(+37.8%)의 뚜렷한 질적 개선</div>
+            <div class="insight-body">
+                <ul>
+                    <li><b>체류시간 대폭 증가:</b> 유입 유저의 평균 체류시간이 5월 7.4초에서 7월 <b>10.2초로 +37.8%(+2.8초) 대폭 상승</b>했습니다 [cite: 1, 15].</li>
+                    <li><b>참여율 상승:</b> 참여율 역시 5월 27.12%에서 7월 <b>27.86%로 +0.74%p 상승</b>하며, 유입된 타겟의 페이지 내용 탐색 의도가 더 깊어졌음을 의미합니다 [cite: 1, 15].</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>3. 향후 개선 사항</h2>
+
+        <div class="insight-card">
+            <span class="insight-badge action">ACTION PLAN</span>
+            <div class="insight-title">마케팅 개선 전략</div>
+            <div class="insight-body">
+                <ul>
+                    <li><b>핵심 포인트:</b> 5월 리뷰 이벤트 대비 7월 LMS 유입량은 소폭 감소하였으나 평균 체류시간(+37.8%) 및 참여율(+0.74%p) 상승을 통한 질적 반응도 개선 확인 [cite: 1, 15]</li>
+                    <li><b>외부 구글폼 CVR 측정의 구조적 한계 검토:</b> 최종 참여 액션이 외부 구글폼으로 연결되어 GA4 상에서 UTM 전환 트래킹이 불가한 기술적 한계 존재 [cite: 15]</li>
+                    <li><b>랜딩 페이지 상단 visual 및 CTA 강화:</b> 늘어난 체류시간(10.2초)을 기반으로 진입 상단 영역에 이벤트 혜택 및 구글폼 연결 버튼을 직관적으로 노출하여 클릭 유도 극대화 추진 [cite: 15]</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <div class="footer">
+        그레이트북스 마케팅팀 김이수 | GA4 Performance Analysis Report
+    </div>
+
+</body>
+</html>
