@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>지비즈 운영 성과 대시보드</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<style>
+  :root{
+    --paper:#F6F3EC; --panel:#FFFFFF; --ink:#20261F; --ink-soft:#5B6459; --line:#E1DCCB;
+    --spruce:#2F5744; --spruce-dim:#43715B; --ochre:#B8843C; --clay:#A4573B;
+    --tint-spruce:#E6EEE7; --tint-ochre:#F4E9D6;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;line-height:1.5;}
+  h1,h2,h3,.serif{font-family:'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif; font-weight:700; letter-spacing:-0.01em;}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px;}
+  header.top{border-bottom:1px solid var(--line);padding:34px 0 22px;background:linear-gradient(180deg, #FBF9F3 0%, var(--paper) 100%);}
+  .kicker{font-size:13px;color:var(--spruce-dim);font-weight:600;margin-bottom:8px;}
+  header.top h1{font-size:32px;font-weight:600;margin:0 0 6px;}
+  header.top p{margin:0;color:var(--ink-soft);font-size:15px;max-width:640px;}
+  .status-row{display:flex;align-items:center;gap:10px;margin-top:16px;font-size:12.5px;color:var(--ink-soft);}
+  .dot{width:7px;height:7px;border-radius:50%;background:#B9B29C;display:inline-block;}
+  .dot.live{background:var(--spruce);}
+  .dot.err{background:var(--clay);}
+  #refreshBtn{border:1px solid var(--line);background:#fff;border-radius:14px;padding:4px 12px;font-size:12px;cursor:pointer;color:var(--spruce-dim);font-family:inherit;}
+  #refreshBtn:hover{border-color:var(--spruce);}
+
+  nav.tabs{position:sticky;top:0;z-index:20;background:rgba(246,243,236,0.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);}
+  nav.tabs .wrap{display:flex;gap:2px;overflow-x:auto;}
+  nav.tabs button{appearance:none;border:none;background:none;cursor:pointer;font-family:'Pretendard',sans-serif;font-size:14.5px;font-weight:500;color:var(--ink-soft);padding:14px 16px;border-bottom:2.5px solid transparent;white-space:nowrap;}
+  nav.tabs button.active{color:var(--spruce);border-bottom-color:var(--spruce);font-weight:600;}
+  nav.tabs button:hover{color:var(--spruce);}
+
+  section.panel{padding:44px 0 8px;border-bottom:1px solid var(--line);}
+  section.panel:last-of-type{border-bottom:none;}
+  .panel-head{margin-bottom:22px;}
+  .panel-head h2{font-size:22px;margin:0 0 6px;font-weight:600;}
+  .panel-head p{margin:0;color:var(--ink-soft);font-size:14.5px;max-width:620px;}
+
+  .kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:26px;}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:20px 20px 18px;}
+  .kpi .label{font-size:13px;color:var(--ink-soft);margin-bottom:10px;}
+  .kpi .value{font-family:'Pretendard',serif;font-size:29px;font-weight:600;}
+  .kpi .delta{font-size:13px;margin-top:8px;font-weight:500;}
+  .delta.down{color:var(--spruce);} .delta.up{color:var(--clay);} .delta.flat{color:var(--ink-soft);}
+
+  .grid-2{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;margin-bottom:20px;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:22px;}
+  .card h3{font-size:15px;margin:0 0 16px;font-weight:600;}
+  .card .chart-wrap{position:relative;height:260px;}
+  .card .chart-wrap.tall{height:320px;}
+  .card .empty-note{color:var(--ink-soft);font-size:13px;padding:20px 0;text-align:center;}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  thead th{text-align:right;font-weight:600;color:var(--ink-soft);font-size:12.5px;padding:8px 10px;border-bottom:1.5px solid var(--line);white-space:nowrap;}
+  thead th:first-child, thead th:nth-child(2){text-align:left;}
+  tbody td{padding:9px 10px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap;}
+  tbody td:first-child, tbody td:nth-child(2){text-align:left;}
+  tbody tr:hover{background:var(--tint-spruce);}
+  .year-tag{display:inline-block;font-size:11.5px;font-weight:600;padding:2px 7px;border-radius:10px;}
+  .year-tag.y2025{background:var(--tint-ochre);color:var(--ochre);}
+  .year-tag.y2026{background:var(--tint-spruce);color:var(--spruce);}
+
+  .insight-list{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+  .insight-card{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--spruce);border-radius:0 3px 3px 0;padding:18px 20px;}
+  .insight-card h4{margin:0 0 10px;font-size:15px;font-weight:600;}
+  .insight-card ul{margin:0;padding-left:18px;font-size:13.5px;color:var(--ink-soft);}
+  .insight-card li{margin-bottom:7px;}
+
+  .banner{max-width:1080px;margin:20px auto 0;padding:14px 28px;}
+  .banner .box{background:#FBEFE9;border:1px solid #E7C7B3;color:#7A3E24;border-radius:4px;padding:14px 18px;font-size:13.5px;}
+  .banner .box a{color:#7A3E24;}
+
+  footer{padding:36px 0 60px;color:var(--ink-soft);font-size:12.5px;}
+  footer a{color:var(--spruce-dim);}
+  .about-box{background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:18px 20px;margin-bottom:16px;}
+  .about-box h4{margin:0 0 10px;font-size:14px;font-weight:600;color:var(--ink);}
+  .about-box ul{margin:0;padding-left:18px;font-size:13px;}
+  .about-box li{margin-bottom:6px;}
+  .foot-note{margin:0;}
+
+  @media (max-width:760px){
+    .kpi-row{grid-template-columns:1fr;} .grid-2{grid-template-columns:1fr;} .insight-list{grid-template-columns:1fr;}
+    header.top h1{font-size:26px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="kicker">그레이트북스 · 마케팅팀</div>
+    <h1>지비즈 운영 성과 대시보드</h1>
+    <p>2025년부터 현재까지 지비즈 서포터즈 모집 광고와 콘텐츠 확보 성과입니다. 원본 구글 시트에서 실시간으로 값을 가져옵니다.</p>
+    <div class="status-row">
+      <span class="dot" id="statusDot"></span>
+      <span id="statusText">데이터 불러오는 중…</span>
+      <button id="refreshBtn" onclick="loadAll(true)">새로고침</button>
+    </div>
+  </div>
+</header>
+
+<div id="errorBanner" class="banner" style="display:none;">
+  <div class="box" id="errorBox"></div>
+</div>
+
+<nav class="tabs">
+  <div class="wrap">
+    <button class="tab-btn active" data-target="overview">개요</button>
+    <button class="tab-btn" data-target="cohorts">기수별 성과</button>
+    <button class="tab-btn" data-target="content">콘텐츠 현황</button>
+    <button class="tab-btn" data-target="ads">최신 기수 광고 상세</button>
+    <button class="tab-btn" data-target="insights">운영 인사이트</button>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <section class="panel" id="overview">
+    <div class="panel-head">
+      <h2>연도별 요약</h2>
+      <p>모집 광고 집행비, 총 신청자 수, 인당 모집 비용(CPA)의 흐름입니다.</p>
+    </div>
+    <div class="kpi-row" id="kpiRow"></div>
+    <div class="grid-2">
+      <div class="card"><h3>연도별 모집 광고비 &amp; 신청자 수</h3><div class="chart-wrap"><canvas id="chartYearlyBar"></canvas></div></div>
+      <div class="card"><h3>인당 모집 비용(CPA) 추이</h3><div class="chart-wrap"><canvas id="chartCpaLine"></canvas></div></div>
+    </div>
+  </section>
+
+  <section class="panel" id="cohorts">
+    <div class="panel-head">
+      <h2>기수별 성과 비교</h2>
+      <p>2025년 1기부터 현재까지 전체 기수의 모집 성과입니다.</p>
+    </div>
+    <div class="card" style="margin-bottom:16px;"><h3>기수별 인당 모집 비용(CPA)</h3><div class="chart-wrap"><canvas id="chartCohortCpa"></canvas></div></div>
+    <div class="card"><h3>전체 기수 데이터</h3>
+      <div style="overflow-x:auto;">
+        <table id="cohortTable">
+          <thead><tr><th>연도</th><th>기수</th><th>모집비</th><th>노출</th><th>도달</th><th>클릭</th><th>신청자</th><th>CTR</th><th>CVR</th><th>CPA</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="content">
+    <div class="panel-head">
+      <h2>콘텐츠 확보 현황</h2>
+      <p>연도별 콘텐츠 확보 총량과 2026년 월별 생산 추이입니다.</p>
+    </div>
+    <div class="grid-2">
+      <div class="card"><h3>연도별 콘텐츠 확보량</h3><div class="chart-wrap"><canvas id="chartContentYear"></canvas></div></div>
+      <div class="card"><h3>기수별 상위노출 점유율</h3><div class="chart-wrap" id="topExposureWrap"><canvas id="chartTopExposure"></canvas></div></div>
+    </div>
+    <div class="card"><h3>2026년 월별 콘텐츠 생산량 (연령대별)</h3><div class="chart-wrap tall"><canvas id="chartMonthly2026"></canvas></div></div>
+  </section>
+
+  <section class="panel" id="ads">
+    <div class="panel-head">
+      <h2 id="adsTitle">최신 기수 광고 캠페인 상세</h2>
+      <p id="adsSub">가장 최근 진행된 모집 캠페인의 소재별 성과와 일별 신청자 추이입니다.</p>
+    </div>
+    <div class="grid-2">
+      <div class="card"><h3>소재별 광고 성과 (클릭수)</h3><div class="chart-wrap" id="matWrap"><canvas id="chartMaterials"></canvas></div></div>
+      <div class="card"><h3>제품별 일차 신청자 수</h3><div class="chart-wrap" id="abdWrap"><canvas id="chartApplicantsByDay"></canvas></div></div>
+    </div>
+    <div class="card"><h3>일별 광고 성과 (노출 · 신청자)</h3><div class="chart-wrap tall" id="dailyWrap"><canvas id="chartDaily"></canvas></div></div>
+  </section>
+
+  <section class="panel" id="insights">
+    <div class="panel-head"><h2>운영 인사이트</h2><p>기수별 성과 데이터를 바탕으로 정리한 분석입니다. 시트가 갱신되면 아래 수치가 최신인지 함께 확인해주세요.</p></div>
+    <div class="insight-list">
+      <div class="insight-card"><h4>2025년 — 기수를 거듭할수록 효율화</h4><ul>
+        <li>2기가 세 기수 중 CPA 최저(523원)이자 CVR 최고(56.4%)로 가장 효율적인 모집이었음</li>
+        <li>1기는 CTR·CVR 모두 양호했지만 CPA는 세 기수 중 가장 높음(684원) — 25년 첫 모집의 학습 비용으로 해석</li>
+        <li>3기는 노출·클릭까지는 충분했으나 신청 전환(CVR 26.6%)이 낮아 CPA가 629원까지 상승</li>
+        <li>연간 전체로는 2024년 대비 CPA 약 27% 절감(841원 → 618원)</li>
+      </ul></div>
+      <div class="insight-card"><h4>2026년 — 기수 내에서도 편차가 큼</h4><ul>
+        <li>9기 CPA 949원으로 전체 기수 중 가장 비효율적 — CVR은 51%로 준수했으나 CPC(145원)가 높았음</li>
+        <li>10기는 CPA 753원으로 소폭 개선, CVR은 41.6%로 오히려 9기보다 낮아짐</li>
+        <li>11기에서 CPA 215원, CVR 93.7%로 급격히 개선 — 세 기수 중 가장 우수한 성과</li>
+        <li>기수 내 편차가 크다는 것은 소재·전집 매력도 같은 개별 요인의 영향이 크다는 뜻이므로, 11기의 성공 요인(소재·타겟·전집)을 다음 기수에 재현할 수 있는지가 핵심 과제</li>
+      </ul></div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="about-box">
+      <h4>이 대시보드에 대해</h4>
+      <ul>
+        <li>기수별 성과, 콘텐츠 현황, 광고 상세, 운영 인사이트 모두 시트에서 실시간으로 불러옵니다</li>
+        <li>시트의 표 구조(섹션 제목·헤더)가 바뀌면 일부 항목이 비어 보일 수 있어요</li>
+        <li>새로고침 버튼을 누르면 캐시를 무시하고 항상 최신 값을 다시 받아옵니다</li>
+      </ul>
+    </div>
+    <p class="foot-note">이 대시보드는 원본 구글 시트를 실시간으로 읽어옵니다. 시트 값이 바뀌면 새로고침만으로 반영됩니다.</p>
+  </div>
+</footer>
+
+<script>
+// ---------------- CONFIG ----------------
+const SHEET_ID = '1TxjjayLpjg1Ya5VIQ7iS_Q2eeasXjhmzW-5CLatDWW0';
+const GIDS = {
+  activity2026: '1859958807',
+  activity2025: '1449932973',
+  ads2026: '1256814606',
+};
+const csvUrl = gid => `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${gid}`;
+const gvizJsonUrl = (gid, cb) => `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?gid=${gid}&headers=0&range=A1:AA1500&tqx=out:json;responseHandler:${cb}`;
+
+// ---------------- palette ----------------
+const inkSoft='#5B6459', spruce='#2F5744', spruceDim='#43715B', ochre='#B8843C', clay='#A4573B', gridColor='#E9E4D6';
+Chart.defaults.font.family = "'Pretendard', sans-serif";
+Chart.defaults.color = inkSoft; Chart.defaults.font.size = 12;
+const palette = [spruce, ochre, clay, spruceDim, '#7A6A9C', '#5B85A6'];
+
+// ---------------- generic parse helpers ----------------
+function num(v){
+  if(v===null||v===undefined) return null;
+  v = String(v).trim();
+  if(v==='' || v==='-' || v==='#DIV/0!') return null;
+  const isPct = v.includes('%');
+  v = v.replace(/,/g,'').replace('%','');
+  const n = parseFloat(v);
+  if(Number.isNaN(n)) return null;
+  return isPct ? n/100 : n;
+}
+function cell(rows,r,c){ return (rows[r] && rows[r][c]!==undefined) ? rows[r][c] : ''; }
+function trimmed(rows,r,c){ return (cell(rows,r,c)||'').toString().trim(); }
+function buildHeaderMap(headerRow){ const m={}; (headerRow||[]).forEach((h,i)=>{ if(h && String(h).trim()) m[String(h).trim()]=i; }); return m; }
+function pick(map, aliases){ for(const a of aliases){ if(a in map) return map[a]; } return -1; }
+function nextNonEmptyRow(rows, from){ let i=from; while(i<rows.length && (!rows[i] || rows[i].every(c=>!c || !String(c).trim()))) i++; return i; }
+function findLabelRow(rows, substr, from=0, to=rows.length){
+  for(let i=from;i<to;i++){ if(trimmed(rows,i,1).includes(substr)) return i; }
+  return -1;
+}
+function sectionEnd(rows, li, to=rows.length){
+  for(let i=li+1;i<to;i++){ if(trimmed(rows,i,1).startsWith('[')) return i; }
+  return to;
+}
+
+const ALIASES = {
+  gen:['구분'], product:['제품'], people:['모집 인원'], spend:['모집 광고 집행비','실집행비'],
+  impressions:['노출'], reach:['도달','도댤'],
+  clicks:['전체 클릭','클릭','클릭(전체)'], linkClicks:['링크 클릭'], applyClicks:['응모 버튼 클릭'],
+  applicants:['총 신청자 수','총 신청 인원','신청자 수 합계'],
+  ctr:['CTR'], cpc:['CPC'], cvr:['CVR'], cvc:['CVC'], cpa:['인당 모집 비용'],
+  date:['날짜','일자'],
+};
+
+async function fetchCSV(gid){
+  // Uses a JSONP-style <script> load against Google's gviz endpoint to avoid
+  // browser CORS restrictions that block a plain fetch() against docs.google.com.
+  return new Promise((resolve, reject) => {
+    const cbName = 'gvizCb_' + gid + '_' + Math.random().toString(36).slice(2);
+    const timer = setTimeout(() => { cleanup(); reject(new Error('시간 초과(15초) — 시트 접근 권한을 확인해주세요')); }, 15000);
+    function cleanup(){
+      clearTimeout(timer);
+      delete window[cbName];
+      if(script.parentNode) script.parentNode.removeChild(script);
+    }
+    window[cbName] = (json) => {
+      cleanup();
+      try{
+        if(!json || !json.table){ reject(new Error('invalid gviz response')); return; }
+        const cols = json.table.cols || [];
+        const width = Math.max(cols.length, 30);
+        const rows = (json.table.rows||[]).map(r => {
+          const arr = [];
+          for(let i=0;i<width;i++){
+            const c = r.c ? r.c[i] : null;
+            if(!c){ arr.push(''); continue; }
+            if(c.f !== undefined && c.f !== null) arr.push(String(c.f));
+            else if(c.v !== undefined && c.v !== null) arr.push(String(c.v));
+            else arr.push('');
+          }
+          return arr;
+        });
+        resolve(rows);
+      }catch(e){ reject(e); }
+    };
+    const script = document.createElement('script');
+    script.src = gvizJsonUrl(gid, cbName);
+    script.onerror = () => { cleanup(); reject(new Error('시트를 불러오지 못했습니다 — 공유 설정을 확인해주세요')); };
+    document.body.appendChild(script);
+  });
+}
+
+// ---------------- section parsers ----------------
+function parseCohortSection(rows, label, year){
+  const li = findLabelRow(rows, label);
+  if(li<0) return [];
+  const end = sectionEnd(rows, li);
+  const headerIdx = nextNonEmptyRow(rows, li+1);
+  const hmap = buildHeaderMap(rows[headerIdx]);
+  const out=[];
+  for(let r=headerIdx+1; r<end; r++){
+    const gen = trimmed(rows,r,1);
+    if(!gen) break;
+    const spend = num(cell(rows,r,pick(hmap,ALIASES.spend)));
+    const applicants = num(cell(rows,r,pick(hmap,ALIASES.applicants)));
+    if(spend==null && applicants==null) continue;
+    out.push({
+      year, gen,
+      people: num(cell(rows,r,pick(hmap,ALIASES.people))),
+      spend, impressions: num(cell(rows,r,pick(hmap,ALIASES.impressions))),
+      reach: num(cell(rows,r,pick(hmap,ALIASES.reach))),
+      clicks: num(cell(rows,r,pick(hmap,ALIASES.clicks))),
+      applicants,
+      ctr: num(cell(rows,r,pick(hmap,ALIASES.ctr))),
+      cvr: num(cell(rows,r,pick(hmap,ALIASES.cvr))),
+      cpa: num(cell(rows,r,pick(hmap,ALIASES.cpa))) ?? ((spend&&applicants)? spend/applicants : null),
+    });
+  }
+  return out;
+}
+
+function parseContentTotal(rows, label){
+  const li = findLabelRow(rows, label);
+  if(li<0) return null;
+  const end = sectionEnd(rows, li);
+  const headerIdx = nextNonEmptyRow(rows, li+1);
+  const hmap = buildHeaderMap(rows[headerIdx]);
+  const totalCol = pick(hmap, ['합계']);
+  let val=null;
+  for(let r=headerIdx+1;r<end;r++){
+    if(trimmed(rows,r,1)==='합계'){ val = num(cell(rows,r,totalCol)); }
+  }
+  return val;
+}
+
+function parseMonthly(rows, label){
+  const li = findLabelRow(rows, label);
+  if(li<0) return null;
+  const end = sectionEnd(rows, li);
+  let headerIdx=-1;
+  for(let i=li+1;i<end;i++){ if(trimmed(rows,i,3)==='매체'){ headerIdx=i; break; } }
+  if(headerIdx<0) return null;
+  const header = rows[headerIdx];
+  const totalColIdx = header.findIndex(h=>(h||'').trim()==='합계');
+  const monthCols = [];
+  for(let c=4; c<(totalColIdx>0?totalColIdx:header.length); c++){
+    if((header[c]||'').trim()) monthCols.push({idx:c, label:header[c].trim()});
+  }
+  const groups = {}; const order=[];
+  let currentGroup=null;
+  for(let r=headerIdx+1;r<end;r++){
+    const tag = trimmed(rows,r,1);
+    if(tag && tag!=='소계' && tag!=='합계') currentGroup = tag;
+    if(tag==='소계' && currentGroup){
+      if(!(currentGroup in groups)){ groups[currentGroup]=monthCols.map(()=>0); order.push(currentGroup); }
+      monthCols.forEach((mc,i)=>{ groups[currentGroup][i]+= (num(cell(rows,r,mc.idx))||0); });
+    }
+  }
+  return {months: monthCols.map(m=>m.label), groups, order};
+}
+
+function parseTopExposure(rows, label, defaultGenPrefix){
+  try{
+    const li = findLabelRow(rows, label);
+    if(li<0) return [];
+    const end = sectionEnd(rows, li);
+    let groupHeaderIdx=-1;
+    for(let i=li+1;i<end;i++){ if(trimmed(rows,i,1)==='구분' && trimmed(rows,i,2)){ groupHeaderIdx=i; break; } }
+    if(groupHeaderIdx<0) return [];
+    const groupRow = rows[groupHeaderIdx];
+    const subRow = rows[groupHeaderIdx+1];
+    let totalsIdx=-1;
+    for(let i=end-1;i>groupHeaderIdx+1;i--){ if(trimmed(rows,i,1)==='합계'){ totalsIdx=i; break; } }
+    if(totalsIdx<0) return [];
+    const totals = rows[totalsIdx];
+    const results=[]; let curGen=null;
+    for(let c=2;c<Math.max(groupRow.length, subRow.length);c++){
+      const gh = (groupRow[c]||'').toString().trim();
+      if(gh) curGen = gh.split('(')[0].trim();
+      const sh = (subRow[c]||'').toString().trim();
+      if(sh.includes('콘텐츠')){
+        const total_content = num(totals[c]);
+        const top = num(totals[c+1]);
+        let share = num(totals[c+2]);
+        if(share==null) share = num(totals[c+3]);
+        if(curGen && total_content!=null){
+          results.push({gen: curGen, total_content, top, share});
+        }
+      }
+    }
+    return results.filter(r=>r.total_content>0);
+  }catch(e){ console.warn('topExposure parse failed', e); return []; }
+}
+
+function findAdBlocks(rows){
+  const idxs=[];
+  const re = /모집 캠페인 광고 성과 보고/;
+  for(let i=0;i<rows.length;i++){ if(re.test(trimmed(rows,i,1))) idxs.push(i); }
+  return idxs;
+}
+
+function parseTableInBlock(rows, label, blockStart, blockEnd){
+  const li = findLabelRow(rows, label, blockStart, blockEnd);
+  if(li<0) return null;
+  const headerIdx = nextNonEmptyRow(rows, li+1);
+  const header = rows[headerIdx];
+  const dataRows=[];
+  for(let r=headerIdx+1;r<blockEnd;r++){
+    const first = trimmed(rows,r,1);
+    if(!first) break;
+    dataRows.push(rows[r]);
+    if(first==='Total') break;
+  }
+  return {header, dataRows};
+}
+
+function parseLatestAdBlock(rows){
+  const blocks = findAdBlocks(rows);
+  if(!blocks.length) return null;
+  const start = blocks[blocks.length-1];
+  const end = rows.length; // latest block always runs to the end of the sheet
+  const titleText = trimmed(rows,start,1);
+  const genMatch = titleText.match(/(\d+기)/);
+  const gen = genMatch ? genMatch[1] : '최신 기수';
+
+  const mat = parseTableInBlock(rows, '소재별 광고 성과', start, end);
+  const materials = [];
+  if(mat){
+    const hmap = buildHeaderMap(mat.header);
+    mat.dataRows.forEach(row=>{
+      const name = trimmed([row],0,1);
+      if(name==='Total') return;
+      materials.push({
+        name,
+        spend: num(cell([row],0,pick(hmap,ALIASES.spend))),
+        impressions: num(cell([row],0,pick(hmap,ALIASES.impressions))),
+        reach: num(cell([row],0,pick(hmap,ALIASES.reach))),
+        clicks: num(cell([row],0,pick(hmap,ALIASES.clicks))),
+        ctr: num(cell([row],0,pick(hmap,ALIASES.ctr))),
+        cpc: num(cell([row],0,pick(hmap,ALIASES.cpc))),
+      });
+    });
+  }
+
+  const dailyT = parseTableInBlock(rows, '일별 광고 성과', start, end);
+  const daily=[];
+  if(dailyT){
+    const hmap = buildHeaderMap(dailyT.header);
+    dailyT.dataRows.forEach(row=>{
+      const d = trimmed([row],0,1);
+      if(d==='Total') return;
+      daily.push({
+        date: d,
+        spend: num(cell([row],0,pick(hmap,ALIASES.spend))),
+        impressions: num(cell([row],0,pick(hmap,ALIASES.impressions))),
+        applicants: num(cell([row],0,pick(hmap,ALIASES.applyClicks))) ?? num(cell([row],0,pick(hmap,ALIASES.applicants))),
+      });
+    });
+  }
+
+  const abdT = parseTableInBlock(rows, '일자별 신청자 수', start, end);
+  let applicantsByDay=null;
+  if(abdT){
+    const header = abdT.header;
+    let totalIdx = header.findIndex(h=>ALIASES.applicants.includes((h||'').trim()));
+    if(totalIdx<0) totalIdx = header.length-1;
+    const productCols=[];
+    for(let c=2;c<totalIdx;c++){ if((header[c]||'').trim()) productCols.push({idx:c, name:header[c].trim()}); }
+    const days=[];
+    abdT.dataRows.forEach(row=>{
+      const d = trimmed([row],0,1);
+      if(d==='Total') return;
+      const entry = {day:d};
+      productCols.forEach(pc=>{ entry[pc.name] = num(cell([row],0,pc.idx)) || 0; });
+      days.push(entry);
+    });
+    applicantsByDay = {products: productCols.map(p=>p.name), days};
+  }
+
+  return {gen, materials, daily, applicantsByDay};
+}
+
+// ---------------- rendering ----------------
+const fmtInt = n => n==null ? '-' : Math.round(n).toLocaleString('ko-KR');
+const fmtWon = n => n==null ? '-' : '₩' + Math.round(n).toLocaleString('ko-KR');
+const fmtPct = n => n==null ? '-' : (n*100).toFixed(1) + '%';
+let chartRegistry = [];
+function makeChart(id, config){
+  const el = document.getElementById(id);
+  if(!el) return;
+  const existing = Chart.getChart(el);
+  if(existing) existing.destroy();
+  const c = new Chart(el, config);
+  chartRegistry.push(c);
+  return c;
+}
+function showEmpty(wrapId, msg){
+  const el = document.getElementById(wrapId);
+  if(el) el.innerHTML = `<div class="empty-note">${msg}</div>`;
+}
+
+function render(DATA){
+  // KPI + yearly
+  const ys = DATA.yearly_summary;
+  if(ys.length){
+    const latest = ys[ys.length-1], prev = ys.length>1 ? ys[ys.length-2] : null;
+    function deltaHtml(curr, prevVal, lowerIsBetter=true){
+      if(prevVal==null || curr==null) return '';
+      const diff = (curr-prevVal)/prevVal;
+      const good = lowerIsBetter ? diff<0 : diff>0;
+      const cls = Math.abs(diff)<0.01 ? 'flat' : (good ? 'down':'up');
+      const arrow = diff<0 ? '↓' : '↑';
+      return `<div class="delta ${cls}">${arrow} 전년 대비 ${(Math.abs(diff)*100).toFixed(1)}%</div>`;
+    }
+    document.getElementById('kpiRow').innerHTML = `
+      <div class="kpi"><div class="label">${latest.year}년 총 모집 광고비</div><div class="value">${fmtWon(latest.spend)}</div>${deltaHtml(latest.spend, prev&&prev.spend, true)}</div>
+      <div class="kpi"><div class="label">${latest.year}년 총 신청자 수</div><div class="value">${fmtInt(latest.applicants)}명</div>${deltaHtml(latest.applicants, prev&&prev.applicants, false)}</div>
+      <div class="kpi"><div class="label">${latest.year}년 인당 모집 비용(CPA)</div><div class="value">${fmtWon(latest.cpa)}</div>${deltaHtml(latest.cpa, prev&&prev.cpa, true)}</div>
+    `;
+    makeChart('chartYearlyBar', {type:'bar', data:{labels: ys.map(y=>y.year+'년'), datasets:[
+      {label:'모집 광고비(원)', data: ys.map(y=>y.spend), backgroundColor: spruce, yAxisID:'y', borderRadius:2, maxBarThickness:46},
+      {label:'신청자 수(명)', data: ys.map(y=>y.applicants), backgroundColor: ochre, yAxisID:'y1', borderRadius:2, maxBarThickness:46},
+    ]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{boxWidth:10,padding:16}}},
+      scales:{y:{position:'left', grid:{color:gridColor}, ticks:{callback:v=>(v/1000000).toFixed(1)+'M'}}, y1:{position:'right', grid:{display:false}}}}});
+    makeChart('chartCpaLine', {type:'line', data:{labels: ys.map(y=>y.year+'년'), datasets:[{label:'CPA', data: ys.map(y=>y.cpa), borderColor:clay, backgroundColor:'rgba(164,87,59,0.12)', fill:true, tension:0.35, pointRadius:4, pointBackgroundColor:clay}]},
+      options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{grid:{color:gridColor}, ticks:{callback:v=>'₩'+v.toLocaleString()}}}}});
+  }
+
+  // cohorts
+  const cohorts = DATA.cohorts;
+  const yearColor = y => y===2025 ? ochre : spruce;
+  if(cohorts.length){
+    makeChart('chartCohortCpa', {type:'bar', data:{labels: cohorts.map(c=>c.year+' '+c.gen), datasets:[{data: cohorts.map(c=>c.cpa), backgroundColor: cohorts.map(c=>yearColor(c.year)), borderRadius:2}]},
+      options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>'CPA ₩'+Math.round(ctx.raw||0).toLocaleString()}}}, scales:{y:{grid:{color:gridColor}, ticks:{callback:v=>'₩'+v.toLocaleString()}}, x:{grid:{display:false}}}}});
+  }
+  document.querySelector('#cohortTable tbody').innerHTML = cohorts.map(c=>`
+    <tr><td><span class="year-tag y${c.year}">${c.year}</span></td><td>${c.gen}</td><td>${fmtWon(c.spend)}</td><td>${fmtInt(c.impressions)}</td>
+    <td>${fmtInt(c.reach)}</td><td>${fmtInt(c.clicks)}</td><td>${fmtInt(c.applicants)}</td><td>${fmtPct(c.ctr)}</td><td>${fmtPct(c.cvr)}</td><td>${fmtWon(c.cpa)}</td></tr>`).join('');
+
+  // content by year
+  const cby = DATA.content_by_year;
+  if(cby.length){
+    makeChart('chartContentYear', {type:'bar', data:{labels: cby.map(c=>c.year+'년'), datasets:[{data: cby.map(c=>c.total), backgroundColor: cby.map(c=>yearColor(c.year)), borderRadius:3, maxBarThickness:60}]},
+      options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{grid:{color:gridColor}}, x:{grid:{display:false}}}}});
+  } else showEmpty('chartContentYear','데이터를 불러오지 못했습니다');
+
+  // top exposure
+  const te = DATA.top_exposure;
+  if(te.length){
+    makeChart('chartTopExposure', {type:'bar', data:{labels: te.map(t=>t.year+' '+t.gen), datasets:[{data: te.map(t=>t.share!=null? +(t.share*100).toFixed(1):0), backgroundColor: te.map(t=>yearColor(t.year)), borderRadius:2}]},
+      options:{responsive:true, maintainAspectRatio:false, indexAxis:'y', plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>ctx.raw+'%'}}}, scales:{x:{grid:{color:gridColor}, ticks:{callback:v=>v+'%'}}, y:{grid:{display:false}}}}});
+  } else { showEmpty('topExposureWrap','현재 시트 구조에서 자동으로 읽지 못했어요. 원본 시트의 [3] 섹션을 확인해주세요.'); }
+
+  // monthly 2026
+  const m26 = DATA.content_monthly_2026;
+  if(m26 && m26.months.length){
+    makeChart('chartMonthly2026', {type:'bar', data:{labels: m26.months, datasets: m26.order.map((g,i)=>({label:g, data:m26.groups[g], backgroundColor: palette[i%palette.length], stack:'s', borderRadius:2}))},
+      options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{boxWidth:10}}}, scales:{y:{grid:{color:gridColor}, stacked:true}, x:{grid:{display:false}, stacked:true}}}});
+  } else showEmpty('chartMonthly2026','데이터를 불러오지 못했습니다');
+
+  // ads (latest block)
+  const ad = DATA.latestAd;
+  if(ad){
+    document.getElementById('adsTitle').textContent = `${ad.gen} 광고 캠페인 상세`;
+    document.getElementById('adsSub').textContent = `가장 최근 완료·진행 중인 ${ad.gen} 모집 캠페인의 소재별 성과와 일별 신청자 추이입니다.`;
+    if(ad.materials.length){
+      makeChart('chartMaterials', {type:'bar', data:{labels: ad.materials.map(m=>m.name), datasets:[{data: ad.materials.map(m=>m.clicks), backgroundColor: spruceDim, borderRadius:2}]},
+        options:{responsive:true, maintainAspectRatio:false, indexAxis:'y', plugins:{legend:{display:false}}, scales:{x:{grid:{color:gridColor}}, y:{grid:{display:false}, ticks:{font:{size:11}}}}}});
+    } else showEmpty('matWrap','데이터를 불러오지 못했습니다');
+
+    if(ad.applicantsByDay && ad.applicantsByDay.days.length){
+      const {products, days} = ad.applicantsByDay;
+      makeChart('chartApplicantsByDay', {type:'bar', data:{labels: days.map(d=>d.day), datasets: products.map((p,i)=>({label:p, data: days.map(d=>d[p]||0), backgroundColor: palette[i%palette.length], stack:'s'}))},
+        options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{boxWidth:10}}}, scales:{y:{grid:{color:gridColor}, stacked:true}, x:{grid:{display:false}, stacked:true}}}});
+    } else showEmpty('abdWrap','데이터를 불러오지 못했습니다');
+
+    if(ad.daily.length){
+      makeChart('chartDaily', {data:{labels: ad.daily.map(d=>d.date), datasets:[
+        {type:'bar', label:'노출', data: ad.daily.map(d=>d.impressions), backgroundColor:'#D9D2BC', yAxisID:'y', borderRadius:2, maxBarThickness:34},
+        {type:'line', label:'신청자', data: ad.daily.map(d=>d.applicants), borderColor:clay, backgroundColor:clay, yAxisID:'y1', tension:0.35, pointRadius:4},
+      ]}, options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{boxWidth:10}}}, scales:{y:{position:'left', grid:{color:gridColor}}, y1:{position:'right', grid:{display:false}}}}});
+    } else showEmpty('dailyWrap','데이터를 불러오지 못했습니다');
+  } else {
+    showEmpty('matWrap','광고 캠페인 리포트를 찾지 못했습니다');
+    showEmpty('abdWrap','광고 캠페인 리포트를 찾지 못했습니다');
+    showEmpty('dailyWrap','광고 캠페인 리포트를 찾지 못했습니다');
+  }
+}
+
+// ---------------- tabs / scroll spy ----------------
+const tabButtons = document.querySelectorAll('.tab-btn');
+tabButtons.forEach(btn=>btn.addEventListener('click', ()=>document.getElementById(btn.dataset.target).scrollIntoView({behavior:'smooth', block:'start'})));
+new IntersectionObserver((entries)=>{ entries.forEach(e=>{ if(e.isIntersecting){ tabButtons.forEach(b=>b.classList.toggle('active', b.dataset.target===e.target.id)); } }); }, {rootMargin:'-40% 0px -55% 0px'})
+  .observe ? document.querySelectorAll('section.panel').forEach(s=>{}) : null;
+{
+  const io = new IntersectionObserver((entries)=>{ entries.forEach(e=>{ if(e.isIntersecting){ tabButtons.forEach(b=>b.classList.toggle('active', b.dataset.target===e.target.id)); } }); }, {rootMargin:'-40% 0px -55% 0px'});
+  document.querySelectorAll('section.panel').forEach(s=>io.observe(s));
+}
+
+// ---------------- main load ----------------
+async function loadAll(forceFresh){
+  const dot = document.getElementById('statusDot');
+  const txt = document.getElementById('statusText');
+  const banner = document.getElementById('errorBanner');
+  banner.style.display='none';
+
+  // show cached data instantly if we have it, while fetching fresh data in the background
+  const CACHE_KEY = 'gbz_dashboard_cache_v1';
+  let cached = null;
+  try{
+    const raw = sessionStorage.getItem(CACHE_KEY);
+    if(raw) cached = JSON.parse(raw);
+  }catch(e){ /* sessionStorage unavailable, ignore */ }
+
+  if(cached && !forceFresh){
+    render(cached.data);
+    dot.className='dot live';
+    txt.textContent = '캐시된 데이터 표시 중 · 최신 데이터 확인 중…';
+  } else {
+    dot.className='dot'; txt.textContent='데이터 불러오는 중…';
+  }
+
+  try{
+    const [rows2026, rows2025, rowsAds] = await Promise.all([
+      fetchCSV(GIDS.activity2026), fetchCSV(GIDS.activity2025), fetchCSV(GIDS.ads2026)
+    ]);
+
+    const cohorts2025 = parseCohortSection(rows2025, '[1] 기수별 모집 광고 성과 및 결과', 2025);
+    const cohorts2026 = parseCohortSection(rows2026, '[1] 기수별 모집 광고 성과 및 결과', 2026);
+    const cohorts = [...cohorts2025, ...cohorts2026];
+
+    function sumYear(list, year){
+      const rows = list.filter(c=>c.year===year);
+      const spend = rows.reduce((a,c)=>a+(c.spend||0),0);
+      const applicants = rows.reduce((a,c)=>a+(c.applicants||0),0);
+      return {year, spend, applicants, cpa: applicants? spend/applicants : null};
+    }
+    const yearly_summary = [sumYear(cohorts,2025), sumYear(cohorts,2026)];
+
+    const content_by_year = [
+      {year:2025, total: parseContentTotal(rows2025, '[2] 기수별 콘텐츠 확보 현황')},
+      {year:2026, total: parseContentTotal(rows2026, '[2] 기수별 콘텐츠 확보 현황')},
+    ].filter(c=>c.total!=null);
+
+    const te2025 = parseTopExposure(rows2025, '[3] 기수별 상위노출 확보 현황').map(t=>({...t, year:2025}));
+    const te2026 = parseTopExposure(rows2026, '[3] 기수별 상위노출 확보 현황').map(t=>({...t, year:2026}));
+    const top_exposure = [...te2025, ...te2026];
+
+    const content_monthly_2026 = parseMonthly(rows2026, '[7] 2026년 월별 콘텐츠 수량');
+
+    const latestAd = parseLatestAdBlock(rowsAds);
+
+    const DATA = {cohorts, yearly_summary, content_by_year, top_exposure, content_monthly_2026, latestAd};
+    render(DATA);
+    try{ sessionStorage.setItem(CACHE_KEY, JSON.stringify({data: DATA, ts: Date.now()})); }catch(e){}
+
+    dot.className='dot live';
+    txt.textContent = '실시간 연동됨 · ' + new Date().toLocaleString('ko-KR');
+  }catch(err){
+    console.error(err);
+    if(cached){
+      dot.className='dot live';
+      txt.textContent = '최신 데이터를 불러오지 못해 캐시된 데이터를 표시 중 · ' + new Date(cached.ts).toLocaleString('ko-KR');
+    } else {
+      dot.className='dot err';
+      txt.textContent = '데이터를 불러오지 못했습니다';
+      banner.style.display='block';
+      document.getElementById('errorBox').innerHTML = `구글 시트에서 데이터를 가져오지 못했습니다. 시트 공유 설정이 "링크가 있는 모든 사용자(뷰어)"로 되어 있는지 확인해주세요. (오류: ${err.message})`;
+    }
+  }
+}
+loadAll();
+</script>
+</body>
+</html>
